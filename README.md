@@ -1,5 +1,5 @@
 # Python_Computer_Vision_Games
----------------------------------
+
 ## Playing with Computer Vision
 
 [![SQBBF.gif](https://s11.gifyu.com/images/SQBBF.gif)](https://www.linkedin.com/in/alokahirrao/)
