@@ -24,6 +24,17 @@
 - **Hand Gesture Recognition** using OpenCV and MediaPipe.
 - **Key Simulation** through custom key press libraries.
 - **Interactive GUI** to select and play different games.
+- **In-Game Quit Control**  
+  - Press **`Q`** at any time to safely quit the current game.
+  - Automatically closes OpenCV windows and releases the camera.
+  - Returns cleanly to the Tkinter GUI without freezing or crashes.
+- **Dynamic Camera Switching**  
+  - Press **`C`** during gameplay to switch between all available webcams.
+  - Automatically cycles through detected camera indices.
+  - No need to restart the application when changing cameras.
+- **Cross-Platform Camera Handling**  
+  - Works with integrated webcams and external USB cameras (Linux & Windows).
+
 
 ![Game photo](https://iili.io/HiNUmvt.jpg)
 ![Game photo](https://iili.io/HiNUbaI.jpg)
@@ -90,6 +101,19 @@
 
 5. **Game Control**:
    - The games are controlled using **hand gestures** detected through **OpenCV** and **MediaPipe**.
+6.  ### In-Game Controls
+
+| Key | Action |
+|---|---|
+| **Q** | Quit the current game safely and return to the GUI |
+| **C** | Switch between available webcams |
+| **R** | Restart the current game (where supported) |
+
+> Camera switching and quitting work consistently across all games, including Pong Classic.
+
+
+Note:
+- Camera and game control keys (**Q**, **C**, **R**) work during gameplay without restarting the application.('R' applicable only to the 4th Game).
 
 ---
 
