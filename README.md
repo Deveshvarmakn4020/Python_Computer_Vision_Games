@@ -96,3 +96,4 @@
 ### Conclusion
 
 This project demonstrates how to build a **hand-gesture-controlled gaming system** using **OpenCV** and **MediaPipe**. By using this directory structure and the accompanying Python scripts, you can easily manage the assets, game logic, and interface for an interactive game.
+# Python_Computer_Vision_Games
