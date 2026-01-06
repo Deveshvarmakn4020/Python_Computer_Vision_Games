@@ -16,6 +16,47 @@ from directkeys2 import PressKey, ReleaseKey
 from directkeys3 import PressKey, ReleaseKey
 from directkeys3 import space_pressed
 
+# ================= CAMERA MANAGER =================
+CAMERA_INDEX = 0
+MAX_CAMERAS = 5  # reasonable upper bound
+
+def open_camera(index):
+    cap = cv2.VideoCapture(index)
+    if not cap.isOpened():
+        cap.release()
+        return None
+    return cap
+
+def get_next_camera(current_index):
+    if len(AVAILABLE_CAMERAS) <= 1:
+        return None, current_index  # No alternative camera exists
+
+    idx = AVAILABLE_CAMERAS.index(current_index)
+    next_idx = (idx + 1) % len(AVAILABLE_CAMERAS)
+    new_index = AVAILABLE_CAMERAS[next_idx]
+
+    cap = cv2.VideoCapture(new_index)
+    if cap.isOpened():
+        return cap, new_index
+
+    cap.release()
+    return None, current_index
+
+
+def list_available_cameras(max_tested=5):
+    available = []
+    for i in range(max_tested):
+        cap = cv2.VideoCapture(i)
+        if cap.isOpened():
+            available.append(i)
+        cap.release()
+    return available
+
+AVAILABLE_CAMERAS = list_available_cameras()
+print("Available cameras:", AVAILABLE_CAMERAS)
+
+
+
 root = Tk()
 root.title("PLAYING WITH COMPUTER VISION ヾ(⌐■_■)ノ♪")
 
@@ -33,7 +74,12 @@ def game1():
 
     current_key_pressed = set()
 
-    video = cv2.VideoCapture(0)
+    global CAMERA_INDEX
+    video = open_camera(CAMERA_INDEX)
+    if video is None:
+        print("No camera available")
+        return
+
 
     while True:
         ret, frame = video.read()
@@ -96,13 +142,34 @@ def game1():
                     ReleaseKey(key)
                 current_key_pressed = set()
         cv2.imshow("Frame", frame)
-        k = cv2.waitKey(1)
-        if k == ord('q'):
-            break
 
-    video.release()
-    cv2.destroyAllWindows()
-    pass
+        k = cv2.waitKey(1) & 0xFF
+
+        if k == ord('q'):
+            video.release()
+            cv2.destroyAllWindows()
+            return  # returns to Tkinter menu safely
+
+        elif k == ord('c'):
+            new_video, new_index = get_next_camera(CAMERA_INDEX)
+
+            if new_video is None:
+                print("Only one camera available — switch ignored")
+                continue
+
+            video.release()
+            video = new_video
+            CAMERA_INDEX = new_index
+            print(f"Switched to camera {CAMERA_INDEX}")
+
+
+    #     k = cv2.waitKey(1)
+    #     if k == ord('q'):
+    #         break
+
+    # video.release()
+    # cv2.destroyAllWindows()
+    # pass
 
 def game2():
     print("Game 2 Selected")
@@ -117,7 +184,12 @@ def game2():
 
     tipIds = [4, 8, 12, 16, 20]
 
-    video = cv2.VideoCapture(0)
+    global CAMERA_INDEX
+    video = open_camera(CAMERA_INDEX)
+    if video is None:
+        print("No camera available")
+        return
+
 
     with mp_hand.Hands(min_detection_confidence=0.5,
                        min_tracking_confidence=0.5) as hands:
@@ -192,12 +264,27 @@ def game2():
                 # else:
                 #     print("Close")
             cv2.imshow("Frame", image)
-            k = cv2.waitKey(1)
+            k = cv2.waitKey(1) & 0xFF
+
             if k == ord('q'):
-                break
-    video.release()
-    cv2.destroyAllWindows()
-    pass
+                video.release()
+                cv2.destroyAllWindows()
+                return  # returns to Tkinter menu safely
+
+            elif k == ord('c'):
+                video.release()
+                video, CAMERA_INDEX = get_next_camera(CAMERA_INDEX)
+                if video:
+                    print(f"Switched to camera {CAMERA_INDEX}")
+                else:
+                    print("No other camera found")
+
+    #         k = cv2.waitKey(1)
+    #         if k == ord('q'):
+    #             break
+    # video.release()
+    # cv2.destroyAllWindows()
+    # pass
 
 def game3():
     print("Game 3 Selected")
@@ -210,7 +297,12 @@ def game3():
 
     current_key_pressed = set()
 
-    video = cv2.VideoCapture(0)
+    global CAMERA_INDEX
+    video = open_camera(CAMERA_INDEX)
+    if video is None:
+        print("No camera available")
+        return
+
 
     while True:
         ret, frame = video.read()
@@ -274,18 +366,34 @@ def game3():
                     ReleaseKey(key)
                 current_key_pressed = set()
         cv2.imshow("Frame", frame)
-        k = cv2.waitKey(1)
-        if k == ord('q'):
-            break
+        k = cv2.waitKey(1) & 0xFF
 
-    video.release()
-    cv2.destroyAllWindows()
-    pass
+        if k == ord('q'):
+            video.release()
+            cv2.destroyAllWindows()
+            return  # returns to Tkinter menu safely
+
+        elif k == ord('c'):
+            video.release()
+            video, CAMERA_INDEX = get_next_camera(CAMERA_INDEX)
+            if video:
+                print(f"Switched to camera {CAMERA_INDEX}")
+            else:
+                print("No other camera found")
+
+
+    # video.release()
+    # cv2.destroyAllWindows()
+    # pass
 
 def game4():
 
     print("Game 4 Selected")
-    cap = cv2.VideoCapture(0)
+    global CAMERA_INDEX
+    cap = open_camera(CAMERA_INDEX)
+    if cap is None:
+        print("No camera available")
+        return
     cap.set(3, 1280)
     cap.set(4, 720)
 
@@ -367,7 +475,22 @@ def game4():
         img[580:700, 20:233] = cv2.resize(imgRaw, (213, 120))
 
         cv2.imshow("Image", img)
-        key = cv2.waitKey(1)
+        # key = cv2.waitKey(1)
+        key = cv2.waitKey(1) & 0xFF
+
+        if key == ord('q'):
+            cap.release()
+            cv2.destroyAllWindows()
+            return  # returns to Tkinter menu safely
+
+        elif key == ord('c'):
+            cap.release()
+            cap, CAMERA_INDEX = get_next_camera(CAMERA_INDEX)
+            if cap:
+                print(f"Switched to camera {CAMERA_INDEX}")
+            else:
+                print("No other camera found")
+
         if key == ord('r'):
             ballPos = [100, 100]
             speedX = 15
@@ -375,9 +498,9 @@ def game4():
             gameOver = False
             score = [0, 0]
             imgGameOver = cv2.imread("Resources/gameOver.png")
-        if key == ord('q'):
-            break
-    pass
+        # if key == ord('q'):
+        #     break
+    # pass
 
 
 # create photo image objects from image files
